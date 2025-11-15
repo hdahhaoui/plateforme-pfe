@@ -1,15 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-import pb from '../config/pocketbase';
-
-export interface Student {
-  id: string;
-  matricule: string;
-  nom: string;
-  prenom: string;
-  specialite: string;
-  moyenne: number;
-}
-
 export function useStudents(selectedSpecialty?: string) {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,17 +16,26 @@ export function useStudents(selectedSpecialty?: string) {
     });
 
     const refresh = async () => {
+      const filter = selectedSpecialty ? `specialite="${selectedSpecialty}"` : undefined;
+      console.log('➡️ useStudents.refresh()', {
+        baseUrl: pb.baseUrl,
+        selectedSpecialty,
+        filter,
+      });
+
       try {
-        const filter = selectedSpecialty ? `specialite="${selectedSpecialty}"` : undefined;
         const list = await pb
           .collection('students')
           .getList(1, 200, { filter, sort: '-moyenne' });
+
+        console.log('✅ students fetched:', list.totalItems);
+
         if (!disposed) {
           setStudents(list.items.map(mapRecord));
           setLoading(false);
         }
       } catch (error) {
-        console.error('Impossible de charger les étudiants', error);
+        console.error('❌ Impossible de charger les étudiants', error);
         if (!disposed) {
           setLoading(false);
         }
