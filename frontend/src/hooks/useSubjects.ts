@@ -31,27 +31,34 @@ export function useSubjects(selectedSpecialty?: string) {
       disponible: !!record.disponible,
     });
 
-    const refresh = async () => {
-      try {
-        const filter = selectedSpecialty
-          ? `specialite="${selectedSpecialty}"`
-          : undefined;
+const refresh = async () => {
+  try {
+    const filter = selectedSpecialty
+      ? `specialite="${selectedSpecialty}"`
+      : undefined;
 
-        const list = await pb
-          .collection('subjects')
-          .getList(1, 200, { filter, sort: 'titre' });
+    // ⚠️ Ne pas envoyer filter=undefined
+    const options: any = { sort: 'titre' };
+    if (filter) {
+      options.filter = filter;
+    }
 
-        if (!disposed) {
-          setSubjects(list.items.map(mapRecord));
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error('Impossible de charger les sujets', error);
-        if (!disposed) {
-          setLoading(false);
-        }
-      }
-    };
+    const list = await pb
+      .collection('subjects')
+      .getList(1, 200, options);
+
+    if (!disposed) {
+      setSubjects(list.items.map(mapRecord));
+      setLoading(false);
+    }
+  } catch (error) {
+    console.error('Impossible de charger les sujets', error);
+    if (!disposed) {
+      setLoading(false);
+    }
+  }
+};
+
 
     refresh();
 
