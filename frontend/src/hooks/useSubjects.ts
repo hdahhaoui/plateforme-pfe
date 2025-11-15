@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import pb from '../config/pocketbase';
 
 export interface Subject {
   id: string;
   code: string;
   titre: string;
+  description?: string;
+  encadrant: string;
   specialite: string;
   type_sujet: 'Classique' | '1275';
-  encadrant?: string;
-  description?: string;
-  disponible?: boolean;
+  disponible: boolean;
 }
 
 export function useSubjects(selectedSpecialty?: string) {
@@ -24,19 +24,23 @@ export function useSubjects(selectedSpecialty?: string) {
       id: record.id,
       code: record.code,
       titre: record.titre,
-      specialite: record.specialite,
-      type_sujet: record.type_sujet || 'Classique',
-      encadrant: record.encadrant,
       description: record.description,
-      disponible: record.disponible,
+      encadrant: record.encadrant,
+      specialite: record.specialite,
+      type_sujet: record.type_sujet,
+      disponible: !!record.disponible,
     });
 
     const refresh = async () => {
       try {
-        const filter = selectedSpecialty ? `specialite="${selectedSpecialty}"` : undefined;
+        const filter = selectedSpecialty
+          ? `specialite="${selectedSpecialty}"`
+          : undefined;
+
         const list = await pb
           .collection('subjects')
           .getList(1, 200, { filter, sort: 'titre' });
+
         if (!disposed) {
           setSubjects(list.items.map(mapRecord));
           setLoading(false);
@@ -65,5 +69,10 @@ export function useSubjects(selectedSpecialty?: string) {
     };
   }, [selectedSpecialty]);
 
-  return { subjects, loading };
+  const sorted = useMemo(
+    () => [...subjects].sort((a, b) => a.titre.localeCompare(b.titre)),
+    [subjects],
+  );
+
+  return { subjects: sorted, loading };
 }
