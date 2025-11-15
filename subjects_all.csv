@@ -1,0 +1,71 @@
+id,code,titre,description,encadrant,specialite,type_sujet,disponible
+,STR-1,"Comportement hydromécanique d’une brique de terre comprimée.","","ABOU-BEKR Nabil / AIT SALEM Abdelmadjid","Structures","Classique",true
+,STR-2,"Etude d'un Bâtiment à usage d'habitation R+ SS","","Aissaoui Nassima / MEDJAHED Amina","Structures","Classique",true
+,STR-3,"Etude de stabilité d’un talus pour la construction d’un bâtiment R+7 à Tlemcen","","AYAD Fatima","Structures","Classique",true
+,STR-4,"Étude et Conception Sismique d'un Hangar Industriel en éléments Préfabriqués et Précontraintes","","BELBACHIR AHMED / MATALLAH Walid","Structures","Classique",true
+,STR-5,"Technical Study of a Reinforced Concrete Building with Thermal Analysis of Utility Systems (Electrical, Gas, and Plumbing).","","BELBACHIR AHMED / HAMIMED Nadia","Structures","Classique",true
+,STR-6,"Investigation numérique de l'effet de goujon dans les poutres en béton Armé.","","BELBACHIR AHMED / BESSAID Mohmed Ibrahim","Structures","Classique",true
+,STR-7,"Migration du modèle constructif traditionnel vers le béton préfabriqué : étude technico-économique et enjeux de modernisation","","BENACHENHOU KAMILA AMEL / LAKERMI Anis","Structures","Classique",true
+,STR-8,"Etude Technique d'un Bâtiment","","Benahchilif souad / Ghennani Boubekeur","Structures","Classique",true
+,STR-9,"Utilisation de l’intelligence artificielle pour la détermination de la contrainte critique locale des structures en acier formé à froid","","Benkelfat Naoual","Structures","Classique",true
+,STR-10,"Etude expérimentale des efficacités inhibitrices de produits issus de l’extraction de plantes vertes de la région de Tlemcen : effet de la température","","BEZZAR Abdel Illah","Structures","Classique",true
+,STR-11,"ETUDE TECHNIQUE D’UN BATIMENT","","Ghennani Boubekeur","Structures","Classique",true
+,STR-12,"Etude technique d’un bâtiment R+6 en béton armé","","Ghezali Sabah","Structures","Classique",true
+,STR-13,"Etude technique d’un bâtiment en béton armé","","HOUTI Farid Brahim","Structures","Classique",true
+,STR-14,"Contribution à l’élaboration d’un géo-polymère à partir de source naturelle","","ALI-DAHMANE Tewfik / HOUTI Farid / BENOSMAN","Structures","Classique",true
+,STR-15,"Etude d’un bâtiment en béton armé R+7 avec deux niveaux de sous-sol","","MAHI Imene","Structures","Classique",true
+,STR-16,"Conception sismique des bâtiments modulaires","","Mohammed MATALLAH","Structures","Classique",true
+,STR-17,"Étude du comportement dynamique des portiques soumis à l’entrechoc sismique : approche comparative entre modèles simplifiés et éléments finis","","MEDJAHED Amina / RETERI Khadidja / RETERI Khadidja","Structures","Classique",true
+,STR-18,"Application de la méthode push over pour l’estimation de la ductilité des structures en béton armé : Étude paramétrique et comparative entre les règlements FEMA440, EC8 et les RPA2024","","MEGNOUNIF Abdellatif","Structures","Classique",true
+,STR-19,"Calcul dynamique des efforts tranchants à la base d’une structure mixte portiques-voiles en béton armé : Étude comparative entre les méthodes statiques équivalentes linéaires et non linéaires des RPA2024","","MEGNOUNIF Abdellatif","Structures","Classique",true
+,STR-20,"Réduction du risque sismique des structures par ajout de systèmes de contrôle vibratoire","","MEGNOUNIF Abdellatif / RETERI Khadidja","Structures","Classique",true
+,STR-21,"Réduction des joints sismiques des structures adjacentes : Étude paramétrique","","MEGNOUNIF Abdellatif / RETERI Khadidja","Structures","Classique",true
+,STR-22,"Contribution à la réduction du risque sismique des structures par intégration de dispositifs piézoélectriques","","MEGNOUNIF Abdellatif / MAAMERI Sana","Structures","Classique",true
+,STR-23,"Application of corrosion inhibitors in the repair of structures damaged by corrosion","","Sail Latefa / Hamimed Nadia / HAMIMED Nadia","Structures","Classique",true
+,STR-24,"Effet de la substitution des granulats par les grains de caoutchouc sur les propriétés mécanique et la microstructure du béton","","SOULIMANE Ilyas","Structures","Classique",true
+,STR-25,"Étude et suivi du processus de fabrication d’une structure métallique : de la conception à la mise en œuvre","","TABET-DERRAZ Moulay Idriss","Structures","Classique",true
+,STR-26,"Étude expérimentale et numérique du passage du béton autoplaçant à travers des armatures : Analyse CFD","","TALEB Omar / HENNAOUI Mustapha","Structures","Classique",true
+,STR-27,"Durabilité des bétons à base de diatomite en milieux agressifs","","TALEB Omar / MELOUKA Smain","Structures","Classique",true
+,STRUCT1275-01,"Automation of the calculation of a prestressed beam","","BABA AHMED Ismain / HAMIMED Nadia","Structures","1275",true
+,STRUCT1275-02,"Formulation et caractérisation des bétons écologiques à base des bio-additifs","","BELAIDI Amina","Structures","1275",true
+,STRUCT1275-03,"ETUDE EXPERIMENTALE ET ECONOMIQUE D’UN BETON LEGER PERFORMANT POUR ELEMENTS PORTEURS","","BENACHENHOU KAMILA AMEL / TALEB Omar","Structures","1275",true
+,STRUCT1275-04,"Valorisation de l’Argile Expansée dans la Formulation d’un Micro-Béton Durable à Granulométrie Optimisée","","BENMAMMAR Mohammed","Structures","1275",true
+,STRUCT1275-05,"Optimisation des performances mécaniques des soutènements de tunnels par les bétons composites fibrés","","Nesrine El Houari / HENAOUI Mustapha","Structures","1275",true
+,STRUCT1275-06,"Contribution au développement innovant des briques en plâtre à base de déchets","","HOUTI Farid Brahim / BENOSMAN / MESLI","Structures","1275",true
+,STRUCT1275-07,"Caractérisation mécanique et durabilité des BTC - Effet du renforcement à l'aide de fibres végétales","","Khelifi Zakia","Structures","1275",true
+,STRUCT1275-08,"Performance thermique d’une dalle en béton-PCM pour l’optimisation énergétique du bâtiment","","MAHI Imene / KHELIFI Zakia","Structures","1275",true
+,STRUCT1275-09,"Dévelopement d'un géolpolymère innovant","","TALEB Omar / BENACHENHOU Kamila / BELAIDI Amina / MELOUKA Smain","Structures","1275",true
+,STRUCT1275-10,"Étude expérimentale et caractérisation thermo-mécanique d’un matériau biosourcé local pour applications dans le bâtiment","","DAHHAOUI Hachimi / TALEB Omar","Structures","1275",true
+,VOA-001,"Vers une meilleure gestion des ouvrages d’art : Optimisation technico-économique et gestion de projet d’un OA, cas du dédoublement de la RN22 (Tlemcen–Terny)","","HAMZAOUI Fethi / MOSTEGHANEMI S","VOA","Classique",true
+,VOA-002,"Étude numérique de l’influence de la surépaisseur du hourdis sur le comportement structurel du tablier à l'aide du logiciel Midas Civil. Application au viaduc V8.7 de Ghazaouet.","","CHEKROUN Lokmane El Hakim / BOUMECHRA N","VOA","Classique",true
+,VOA-003,"Modélisation numérique de l’essai de chargement statique des pieux pour l’évaluation de la capacité portante – Application à l’aide du logiciel Plaxis.","","CHEKROUN Lokmane El Hakim / BOUMECHRA N","VOA","Classique",true
+,VOA-004,"Analyse des déplacements et des interactions sol–structure lors du creusement de tunnels jumeaux","","El Houari Nesrine","VOA","Classique",true
+,VOA-005,"Importance des SIG dans le choix et l’implantation des projets de génie civil","","RETERI Khadidja / MEDJAHED Amina","VOA","Classique",true
+,VOA-006,"Analyse du cycle de vie d’une solution géosynthétique en ligne ferroviaire.","","TROUZINE Habib","VOA","Classique",true
+,VOA-007,"Analyse du cycle de vie d’un ouvrage ferroviaire","","TROUZINE Habib","VOA","Classique",true
+,VOA-008,"Étude de l’extension à long terme de l’aéroport de la wilaya d’El Oued, conception et dimensionnement de l’aérogare et de l’aérodrome.","","SOULIMANE Ilyas","VOA","Classique",true
+,VOA-009,"Méthodes analytiques pour la prise en charge de gonflement dans la vérification des ouvrages.","","ZADJAOUI Abdeldjalil / TROUZINE Habib","VOA","Classique",true
+,VOA-010,"Justification des fondations profondes : Synthèse de la réglementation","","ZADJAOUI Abdeldjalil / TROUZINE Habib","VOA","Classique",true
+,VOA-011,"Projet route reliant la localité de GAALOUL à la route nationale 22 sur 2,7 km (wilaya de Naama)","","Cherif Benmoussa Mohamed Yazid","VOA","Classique",true
+,VOA-012,"Projet route dans la localité MEKMEN BEN AMAR sur 4,0 km","","Cherif Benmoussa Mohamed Yazid","VOA","Classique",true
+,VOA-013,"Étude expérimentale des efficacités inhibitrices de produits issus de l’extraction de plantes vertes de la région de Tlemcen.","","BEZZAR Abdel Illah","VOA","Classique",true
+,VOA-014,"Risque retrait/gonflement des argiles dans les chaussées","","BENCHOUK Assia / AIT SALEM Ahmed Abdelmadjid","VOA","Classique",true
+,VOA-015,"Performance d’une passerelle piétonne en acier formé à froid sous charges statiques et dynamiques","","BENKELFAT Naoual / BENMANSOUR Nassima","VOA","Classique",true
+,VOA-016,"Vers une gestion intelligente du suivi de chantier : intégration de bots et services cloud","","DAHHAOUI Hachimi / HAMZAOUI Fethi","VOA","1275",true
+,VOA-017,"Prédiction numérique hybride de l’interaction sol–tunnel–structure : Approches éléments finis et IA","","El Houari Nesrine / DAHHAOUI Hachimi","VOA","Classique",true
+,RIB01,"Réhabilitation d'un bâtiment traditionnel : Foundouk Benosman (Foundouk El Medersa) à Tlemcen","","BOUMECHRA Nadir","RIB","Classique",true
+,RIB02,"Chemisage des structures en béton armé : Conception et techniques utilisées","","BOUMECHRA Nadir","RIB","Classique",true
+,RIB03,"Étude du renforcement des poutres en béton armé par des matériaux composites à base de fibres de carbone (CFRP)","","TABET-DERRAZ Moulay Idriss","RIB","Classique",true
+,RIB04,"Automatisation de la réhabilitation énergétique d’un bâtiment","","Maachou Omar / Dahhaoui Hachimi","RIB","1275",true
+,RIB05,"Application de l’intelligence artificielle pour la prédiction du comportement hygrothermique d’une maison en briques de terre comprimée","","Dahhaoui Hachimi / Maachou Omar","RIB","1275",true
+,RIB06,"A State-of-the-Art Study on Standard Frameworks for Building Rehabilitation","","Nadia HAMIMED / Omar MAACHOU","RIB","Classique",true
+,RIB07,"Analyse des fissurations dans une structure en béton et proposition d’une stratégie de réhabilitation : approche expérimentale et analytique","","BENACHENHOU / Taleb Omar","RIB","Classique",true
+,RIB08,"Gestion du risque de défaillance structurelle dans les bâtiments anciens réhabilités à l’aide des réseaux bayésiens","","Benachenhou Kamila / Lakermi Anis","RIB","Classique",true
+,RIB09,"Vers un diagnostic intelligent des pathologies du béton : approche expérimentale et probabiliste basée sur les réseaux bayésiens","","Benachenhou Kamila / Dahhaoui Hachimi / Taleb Omar","RIB","1275",true
+,RIB10,"Étude comparative entre de différents algorithmes d’intelligence artificielle appliqués à l’aléa sismique","","Derras Boumédiène","RIB","Classique",true
+,RIB11,"Formulation et comportement des mortiers verts de réparation","","Taleb Omar / Benachenhou Kamila / Benmmamar Mohammed","RIB","1275",true
+,RIB12,"Étude de durabilité des mortiers innovants de réparation","","Taleb Omar / Benachenhou Kamila / Benmmamar Mohammed","RIB","1275",true
+,RIB13,"Analyse expérimentale des mortiers de réparation sur des bétons fissurés","","Taleb Omar / Benachenhou Kamila / Benmmamar Mohammed","RIB","1275",true
+,RIB14,"Mortier de réparation fibré : influence du type et du dosage des fibres","","Taleb Omar / Benachenhou Kamila / Dahhaoui Hachimi","RIB","1275",true
+,RIB15,"Influence du latex sur le comportement des mortiers de réparation","","Taleb Omar / Benachenhou Kamila / Dahhaoui Hachimi","RIB","1275",true
+,RIB16,"Rénovation thermique d’une façade existante par ajout d’une façade ventilée","","Benachenhou Kamila / Hennaoui Mustapha / Taleb Omar","RIB","1275",true

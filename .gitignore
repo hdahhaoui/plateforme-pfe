@@ -1,0 +1,16 @@
+# Dependencies
+node_modules
+
+# Builds
+dist
+frontend/dist
+functions/lib
+
+# Env
+.env
+frontend/.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

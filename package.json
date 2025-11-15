@@ -1,0 +1,22 @@
+{
+  "name": "plateforme-pfe",
+  "version": "1.0.0",
+  "description": "Plateforme PFE (React + PocketBase + Vercel).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "import:pocketbase": "node scripts/import-pocketbase.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "csv-parse": "^6.1.0",
+    "dotenv": "^16.4.5",
+    "pocketbase": "^0.21.1"
+  }
+}
