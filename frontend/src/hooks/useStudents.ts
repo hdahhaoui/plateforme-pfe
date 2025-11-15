@@ -10,6 +10,14 @@ export interface Student {
   moyenne: number;
 }
 
+// petite fonction pour nettoyer la spécialité
+function normalizeSpecialty(raw?: string) {
+  if (!raw) return undefined;
+  const trimmed = raw.trim();
+  // enlève des guillemets autour : "VOA" → VOA
+  return trimmed.replace(/^"(.*)"$/, '$1');
+}
+
 export function useStudents(selectedSpecialty?: string) {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,34 +35,32 @@ export function useStudents(selectedSpecialty?: string) {
       moyenne: record.moyenne,
     });
 
-const refresh = async () => {
-  try {
-    const filter = selectedSpecialty
-      ? `specialite="${selectedSpecialty}"`
-      : undefined;
+    const refresh = async () => {
+      try {
+        const specialty = normalizeSpecialty(selectedSpecialty);
 
-    // ⚠️ Construire les options sans mettre filter=undefined
-    const options: any = { sort: '-moyenne' };
-    if (filter) {
-      options.filter = filter;
-    }
+        const filter = specialty ? `specialite="${specialty}"` : undefined;
 
-    const list = await pb
-      .collection('students')
-      .getList(1, 200, options);
+        const options: any = { sort: '-moyenne' };
+        if (filter) {
+          options.filter = filter;
+        }
 
-    if (!disposed) {
-      setStudents(list.items.map(mapRecord));
-      setLoading(false);
-    }
-  } catch (error) {
-    console.error('Impossible de charger les étudiants', error);
-    if (!disposed) {
-      setLoading(false);
-    }
-  }
-};
+        const list = await pb
+          .collection('students')
+          .getList(1, 200, options);
 
+        if (!disposed) {
+          setStudents(list.items.map(mapRecord));
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Impossible de charger les étudiants', error);
+        if (!disposed) {
+          setLoading(false);
+        }
+      }
+    };
 
     refresh();
 
