@@ -12,6 +12,12 @@ export interface Subject {
   disponible: boolean;
 }
 
+function normalizeSpecialty(raw?: string) {
+  if (!raw) return undefined;
+  const trimmed = raw.trim();
+  return trimmed.replace(/^"(.*)"$/, '$1');
+}
+
 export function useSubjects(selectedSpecialty?: string) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,34 +37,31 @@ export function useSubjects(selectedSpecialty?: string) {
       disponible: !!record.disponible,
     });
 
-const refresh = async () => {
-  try {
-    const filter = selectedSpecialty
-      ? `specialite="${selectedSpecialty}"`
-      : undefined;
+    const refresh = async () => {
+      try {
+        const specialty = normalizeSpecialty(selectedSpecialty);
+        const filter = specialty ? `specialite="${specialty}"` : undefined;
 
-    // ⚠️ Ne pas envoyer filter=undefined
-    const options: any = { sort: 'titre' };
-    if (filter) {
-      options.filter = filter;
-    }
+        const options: any = { sort: 'titre' };
+        if (filter) {
+          options.filter = filter;
+        }
 
-    const list = await pb
-      .collection('subjects')
-      .getList(1, 200, options);
+        const list = await pb
+          .collection('subjects')
+          .getList(1, 200, options);
 
-    if (!disposed) {
-      setSubjects(list.items.map(mapRecord));
-      setLoading(false);
-    }
-  } catch (error) {
-    console.error('Impossible de charger les sujets', error);
-    if (!disposed) {
-      setLoading(false);
-    }
-  }
-};
-
+        if (!disposed) {
+          setSubjects(list.items.map(mapRecord));
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Impossible de charger les sujets', error);
+        if (!disposed) {
+          setLoading(false);
+        }
+      }
+    };
 
     refresh();
 
