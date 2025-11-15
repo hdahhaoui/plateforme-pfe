@@ -27,27 +27,34 @@ export function useStudents(selectedSpecialty?: string) {
       moyenne: record.moyenne,
     });
 
-    const refresh = async () => {
-      try {
-        const filter = selectedSpecialty
-          ? `specialite="${selectedSpecialty}"`
-          : undefined;
+const refresh = async () => {
+  try {
+    const filter = selectedSpecialty
+      ? `specialite="${selectedSpecialty}"`
+      : undefined;
 
-        const list = await pb
-          .collection('students')
-          .getList(1, 200, { filter, sort: '-moyenne' });
+    // ⚠️ Construire les options sans mettre filter=undefined
+    const options: any = { sort: '-moyenne' };
+    if (filter) {
+      options.filter = filter;
+    }
 
-        if (!disposed) {
-          setStudents(list.items.map(mapRecord));
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error('Impossible de charger les étudiants', error);
-        if (!disposed) {
-          setLoading(false);
-        }
-      }
-    };
+    const list = await pb
+      .collection('students')
+      .getList(1, 200, options);
+
+    if (!disposed) {
+      setStudents(list.items.map(mapRecord));
+      setLoading(false);
+    }
+  } catch (error) {
+    console.error('Impossible de charger les étudiants', error);
+    if (!disposed) {
+      setLoading(false);
+    }
+  }
+};
+
 
     refresh();
 
