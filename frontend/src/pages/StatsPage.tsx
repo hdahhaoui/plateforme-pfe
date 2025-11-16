@@ -4,12 +4,18 @@ function StatsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Classement en temps réel</h1>
+        <h1 className="text-2xl font-bold text-slate-900">
+          Classement en temps réel
+        </h1>
+
         <p className="text-sm text-slate-500">
-          Toute personne peut consulter les affectations provisoires, les files d’attente et les choix enregistrés,
-          ainsi que l’état des étudiants sans sujets disponibles.
+          Accédez au classement actualisé, aux affectations provisoires, aux files
+          d’attente, aux choix soumis par les étudiants, ainsi qu’au statut des
+          étudiants sans sujets disponibles. Les noms des encadrants et les codes
+          des sujets apparaîtront automatiquement selon les données enregistrées.
         </p>
       </div>
+
       <StatsDashboard />
     </div>
   );
