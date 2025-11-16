@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import pb from '../config/pocketbase';
+import { useSubjects } from '../hooks/useSubjects';
 
 interface Member {
   matricule: string;
@@ -35,6 +36,17 @@ function StatsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [specialtyFilter, setSpecialtyFilter] = useState<string>('');
+  const { subjects } = useSubjects();
+
+  const subjectsEncadrantsByCode = useMemo(() => {
+    const map: Record<string, string> = {};
+    subjects.forEach((subject) => {
+      if (subject.code) {
+        map[subject.code] = subject.encadrant;
+      }
+    });
+    return map;
+  }, [subjects]);
 
   // 🔁 Chargement simple (pas de temps réel)
   useEffect(() => {
@@ -115,18 +127,19 @@ function StatsDashboard() {
       const chosen = picks.find((pick) => !takenSubjects.has(pick.subjectCode));
 
       if (chosen) {
+        const encadrantFromSubject = subjectsEncadrantsByCode[chosen.subjectCode];
         takenSubjects.add(chosen.subjectCode);
         result[row.id] = {
           subjectCode: chosen.subjectCode,
           subjectTitle: chosen.subjectTitle,
           priority: chosen.priority,
-          encadrant: chosen.encadrant,
+          encadrant: chosen.encadrant ?? encadrantFromSubject,
         };
       }
     }
 
     return result;
-  }, [rows]);
+  }, [rows, subjectsEncadrantsByCode]);
 
   if (loading) {
     return (
