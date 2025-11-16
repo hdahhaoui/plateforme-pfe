@@ -34,6 +34,7 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
       subjectType: subject.type_sujet,
       specialty: subject.specialite,
       isOutOfSpecialty,
+      encadrant: subject.encadrant, // ✅ on stocke aussi l’encadrant
     };
 
     const filtered = picks.filter(
@@ -46,12 +47,6 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
 
   return (
     <div className="space-y-6">
-      {subjects.length === 0 && (
-        <p className="text-sm text-slate-500">
-          Aucun sujet disponible pour cette spécialité.
-        </p>
-      )}
-
       {orderedPicks.map((pick) => (
         <div key={pick.priority} className="rounded-xl bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
@@ -81,16 +76,22 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
                 key={subject.code}
                 onClick={() =>
                   handleSelect(
-                    pick.priority,
+                    (pick as DisplayPick).priority,
                     subject,
                     subject.specialite !== specialty && subject.type_sujet === '1275',
                   )
                 }
                 className="rounded border border-slate-200 p-3 text-left text-sm hover:border-slate-400"
               >
-                <p className="font-semibold text-slate-800">{subject.titre}</p>
+                <p className="font-semibold text-slate-800">
+                  {subject.titre}
+                </p>
                 <p className="text-xs text-slate-500">
-                  {subject.specialite} · {subject.type_sujet.toUpperCase()}
+                  {subject.code} · {subject.specialite} ·{' '}
+                  {subject.type_sujet.toUpperCase()}
+                </p>
+                <p className="text-xs text-slate-500">
+                  Encadrant : {subject.encadrant}
                 </p>
               </button>
             ))}
@@ -110,7 +111,7 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
       </button>
       <p className="text-xs text-slate-400">
         Une fois vos choix enregistrés, ils seront verrouillés. Pour toute
-        modification, contactez l'administration.
+        modification, contactez l&apos;administration.
       </p>
     </div>
   );
