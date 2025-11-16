@@ -10,18 +10,22 @@ function useQuery() {
   return useMemo(() => new URLSearchParams(search), [search]);
 }
 
+// petite fonction pour nettoyer les libellés de spécialité
+function normalizeSpecialtyLabel(raw: string) {
+  if (!raw) return '';
+  const trimmed = raw.trim();
+  return trimmed.replace(/^"(.*)"$/, '$1');
+}
+
 function SelectionPage() {
   const query = useQuery();
   const modeQuery = query.get('mode') === 'binome' ? 'binome' : 'monome';
 
-  // ⛔️ ANCIEN (ne filtrait pas les sujets)
-  // const { subjects } = useSubjects();
-
-  // ✅ NOUVEAU : FILTRE LES SUJETS PAR SPÉCIALITÉ
-  const [specialty, setSpecialty] = useState<string>();
-  const { subjects } = useSubjects(specialty);
+  // on récupère tous les sujets, juste pour construire la liste des spécialités
+  const { subjects } = useSubjects();
 
   const { members, setMembers, mode, setMode, picks } = useSelectionStore();
+  const [specialty, setSpecialty] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -30,6 +34,17 @@ function SelectionPage() {
   }, [modeQuery, setMode]);
 
   const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+  // spécialités uniques, normalisées
+  const specialties = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          subjects.map((subject) => normalizeSpecialtyLabel(subject.specialite)),
+        ),
+      ).filter((s) => s !== ''),
+    [subjects],
+  );
 
   const submitChoices = async () => {
     setMessage(null);
@@ -62,7 +77,9 @@ function SelectionPage() {
 
       setMessage('Vos choix ont été enregistrés et verrouillés.');
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Erreur lors de la soumission.');
+      setMessage(
+        err instanceof Error ? err.message : 'Erreur lors de la soumission.',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -72,21 +89,24 @@ function SelectionPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase text-slate-400">Mode sélectionné</p>
+          <p className="text-xs font-semibold uppercase text-slate-400">
+            Mode sélectionné
+          </p>
           <h2 className="text-2xl font-bold text-slate-900">
             {mode === 'binome' ? 'Binôme' : 'Monome'}
           </h2>
         </div>
 
-        {/* SELECT SPECIALITE */}
+        {/* Select de spécialité */}
         <select
           className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
           value={specialty || ''}
-          onChange={(event) => setSpecialty(event.target.value || undefined)}
+          onChange={(event) =>
+            setSpecialty(event.target.value || undefined)
+          }
         >
           <option value="">Toutes les spécialités</option>
-
-          {[...new Set(subjects.map((subject) => subject.specialite))].map((s) => (
+          {specialties.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
@@ -94,7 +114,7 @@ function SelectionPage() {
         </select>
       </div>
 
-      {/* FILTRE LES ÉTUDIANTS */}
+      {/* Étudiants filtrés par spécialité */}
       <StudentSelector
         specialtyFilter={specialty}
         selected={members}
@@ -102,7 +122,7 @@ function SelectionPage() {
         mode={mode}
       />
 
-      {/* FILTRE LES SUJETS */}
+      {/* Saisie des choix de sujets (la spécialité est envoyée à ChoiceWizard) */}
       <ChoiceWizard
         specialty={specialty || members[0]?.specialite}
         onSubmit={submitChoices}
