@@ -28,15 +28,15 @@ function SelectionPage() {
   const submitChoices = async () => {
     setMessage(null);
 
-    // ✅ vérifier qu'on a au moins un étudiant
+    // 1) Vérifier qu'un étudiant est sélectionné
     if (members.length === 0) {
-      setMessage('Sélectionnez au moins un étudiant.');
+      setMessage('Sélectionnez d’abord un étudiant.');
       return;
     }
 
-    // ✅ exiger exactement 4 sujets
+    // 2) Vérifier qu’on a exactement 4 sujets
     if (picks.length !== 4) {
-      setMessage('Vous devez sélectionner exactement 4 sujets (4 choix).');
+      setMessage('Vous devez sélectionner exactement 4 sujets.');
       return;
     }
 
@@ -56,6 +56,44 @@ function SelectionPage() {
           mode,
         }),
       });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        // On remonte le vrai message backend si disponible
+        throw new Error(
+          (payload && payload.error) || 'Impossible de soumettre vos choix.',
+        );
+      }
+
+      setMessage('Vos choix ont été enregistrés et verrouillés.');
+    } catch (err) {
+      setMessage(
+        err instanceof Error ? err.message : 'Erreur lors de la soumission.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        // On remonte le vrai message backend si disponible
+        throw new Error(
+          (payload && payload.error) || 'Impossible de soumettre vos choix.',
+        );
+      }
+
+      setMessage('Vos choix ont été enregistrés et verrouillés.');
+    } catch (err) {
+      setMessage(
+        err instanceof Error ? err.message : 'Erreur lors de la soumission.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
