@@ -186,9 +186,6 @@ function StatsDashboard() {
           </h2>
           <p className="text-xs text-slate-500">
             Trié par score de priorité décroissant (moyenne + ordre des choix).
-            L&apos;affectation des sujets est calculée en tenant compte du score
-            et de la priorité (choix 1 à 4), chaque sujet ne pouvant être
-            attribué qu&apos;une seule fois.
           </p>
         </div>
 

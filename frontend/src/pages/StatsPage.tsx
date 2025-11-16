@@ -9,10 +9,9 @@ function StatsPage() {
         </h1>
 
         <p className="text-sm text-slate-500">
-          Accédez au classement actualisé, aux affectations provisoires, aux files
-          d’attente, aux choix soumis par les étudiants, ainsi qu’au statut des
-          étudiants sans sujets disponibles. Les noms des encadrants et les codes
-          des sujets apparaîtront automatiquement selon les données enregistrées.
+          Trié par score de priorité décroissant (moyenne + ordre des choix).
+          Les noms des encadrants et les codes des sujets apparaîtront
+          automatiquement selon les données enregistrées.
         </p>
       </div>
 
