@@ -12,7 +12,7 @@ const normalizeType = (type?: string) =>
   type?.toLowerCase() === '1275' ? '1275' : 'classique';
 
 export function validateChoicePayload(params: ValidateChoiceParams) {
-  // ✅ Vérification du mode
+  // --- Vérification du mode ---
   if (params.mode === 'monome' && params.members.length !== 1) {
     throw new Error('Sélectionnez un seul étudiant pour le mode monome.');
   }
@@ -21,14 +21,13 @@ export function validateChoicePayload(params: ValidateChoiceParams) {
     throw new Error('Le mode binôme nécessite deux étudiants.');
   }
 
-  // ✅ OBLIGATION : exactement 4 sujets
+  // --- OBLIGATION : exactement 4 sujets ---
   if (!Array.isArray(params.picks) || params.picks.length !== 4) {
     throw new Error('Vous devez fournir exactement 4 sujets.');
   }
 
   const seenSubjects = new Set<string>();
-  let outOfSpecialtyCount = 0;
-  let subjectType: 'classique' | '1275' | null = null;
+  let outOfSpecialty1275Count = 0;
 
   params.picks.forEach((pick) => {
     // Pas de doublon de sujet
@@ -43,34 +42,25 @@ export function validateChoicePayload(params: ValidateChoiceParams) {
     }
 
     const currentType = normalizeType(subject.type_sujet);
-    if (!subjectType) {
-      subjectType = currentType;
-    }
-
-    // Tous les choix doivent être du même type
-    if (subjectType !== currentType) {
-      throw new Error(
-        'Tous les choix doivent être du même type (4 classiques OU 4 projets 1275).',
-      );
-    }
-
     const memberSpecialty = params.specialty || params.members[0]?.specialite;
 
-    // Pour les sujets classiques : même spécialité obligatoire
-    if (currentType === 'classique' && subject.specialite !== memberSpecialty) {
-      throw new Error(
-        'Les sujets classiques doivent appartenir à votre spécialité.',
-      );
+    // Règle pour les sujets classiques : même spécialité obligatoire
+    if (currentType === 'classique') {
+      if (subject.specialite !== memberSpecialty) {
+        throw new Error(
+          'Les sujets classiques doivent appartenir à votre spécialité.',
+        );
+      }
     }
 
-    // Pour les sujets 1275 : on compte ceux hors spécialité
-    if (subject.specialite !== memberSpecialty && currentType === '1275') {
-      outOfSpecialtyCount += 1;
+    // Règle pour les 1275 : on compte ceux hors spécialité
+    if (currentType === '1275' && subject.specialite !== memberSpecialty) {
+      outOfSpecialty1275Count += 1;
     }
   });
 
-  // Un seul 1275 hors spécialité permis
-  if (outOfSpecialtyCount > 1) {
+  // Un seul 1275 hors spécialité autorisé
+  if (outOfSpecialty1275Count > 1) {
     throw new Error('Un seul sujet 1275 hors spécialité est autorisé.');
   }
 }
