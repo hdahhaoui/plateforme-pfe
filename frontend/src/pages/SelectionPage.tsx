@@ -13,9 +13,15 @@ function useQuery() {
 function SelectionPage() {
   const query = useQuery();
   const modeQuery = query.get('mode') === 'binome' ? 'binome' : 'monome';
-  const { subjects } = useSubjects();
-  const { members, setMembers, mode, setMode, picks } = useSelectionStore();
+
+  // ⛔️ ANCIEN (ne filtrait pas les sujets)
+  // const { subjects } = useSubjects();
+
+  // ✅ NOUVEAU : FILTRE LES SUJETS PAR SPÉCIALITÉ
   const [specialty, setSpecialty] = useState<string>();
+  const { subjects } = useSubjects(specialty);
+
+  const { members, setMembers, mode, setMode, picks } = useSelectionStore();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -67,14 +73,19 @@ function SelectionPage() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-semibold uppercase text-slate-400">Mode sélectionné</p>
-          <h2 className="text-2xl font-bold text-slate-900">{mode === 'binome' ? 'Binôme' : 'Monome'}</h2>
+          <h2 className="text-2xl font-bold text-slate-900">
+            {mode === 'binome' ? 'Binôme' : 'Monome'}
+          </h2>
         </div>
+
+        {/* SELECT SPECIALITE */}
         <select
           className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
           value={specialty || ''}
           onChange={(event) => setSpecialty(event.target.value || undefined)}
         >
           <option value="">Toutes les spécialités</option>
+
           {[...new Set(subjects.map((subject) => subject.specialite))].map((s) => (
             <option key={s} value={s}>
               {s}
@@ -83,8 +94,15 @@ function SelectionPage() {
         </select>
       </div>
 
-      <StudentSelector specialtyFilter={specialty} selected={members} onChange={setMembers} mode={mode} />
+      {/* FILTRE LES ÉTUDIANTS */}
+      <StudentSelector
+        specialtyFilter={specialty}
+        selected={members}
+        onChange={setMembers}
+        mode={mode}
+      />
 
+      {/* FILTRE LES SUJETS */}
       <ChoiceWizard
         specialty={specialty || members[0]?.specialite}
         onSubmit={submitChoices}
