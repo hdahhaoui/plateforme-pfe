@@ -1,5 +1,3 @@
-/// <reference types="node" />
-
 import { getPocketBaseAdmin } from './_lib/pocketbase';
 import { recomputeAssignments } from './_lib/matching';
 import type { ChoicePick, Mode, StudentRecord, SubjectRecord } from './_lib/types';
@@ -115,17 +113,22 @@ export default async function handler(req: any, res: any) {
       phone: r.phone,
     }));
 
+    // Récupérer les sujets concernés
     const subjectsMap = new Map<string, SubjectRecord>();
     for (const pick of body.picks) {
       if (!subjectsMap.has(pick.subjectCode)) {
-        const subject = await pb.collection('subjects')
+        const subject = await pb
+          .collection('subjects')
           .getFirstListItem(`code="${pick.subjectCode}"`)
           .catch(() => {
             throw new Error(`Sujet introuvable (${pick.subjectCode}).`);
           });
-        subjectsMap.set(pick.subjectCode, subject as SubjectRecord);
+
+        // 👇 Ici on assouplit le typage pour éviter l'erreur TS2352
+        subjectsMap.set(pick.subjectCode, subject as any);
       }
     }
+
 
     validateChoicePayload({
       mode: body.mode,
