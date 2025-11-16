@@ -1,7 +1,7 @@
-// Pour que TypeScript accepte process.env sans types Node
+// Déclaration minimale pour process.env
 declare const process: any;
 
-import { getPocketBaseAdmin } from './_lib/pocketbase';
+import { getPocketBaseAdmin } from './_lib/pocketbase.js';
 import { recomputeAssignments } from './_lib/matching';
 
 export default async function handler(req: any, res: any) {
@@ -21,6 +21,7 @@ export default async function handler(req: any, res: any) {
     await recomputeAssignments(pb);
     res.status(200).json({ success: true });
   } catch (error: any) {
+    console.error('Erreur recomputeAssignments:', error);
     res
       .status(500)
       .json({ error: error?.message || 'Erreur lors du recalcul.' });
