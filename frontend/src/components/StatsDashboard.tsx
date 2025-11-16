@@ -238,12 +238,26 @@ function StatsDashboard() {
                           {assignment.subjectTitle}
                         </span>
                         <span className="text-[11px] uppercase text-slate-400">
-                          Code : {assignment.subjectCode} · Choix #
-                          {assignment.priority}
-                        </span>
-                        <span className="text-[11px] text-slate-500">
-                          Encadrant :{' '}
-                          {assignment.encadrant ?? 'Non renseigné'}
+                          Code : {assignment.subjectCode}
+                          {assignment.encadrant ? (
+                            <>
+                              {' '}
+                              ·{' '}
+                              <span className="text-[11px] normal-case text-slate-600">
+                                Encadrant : {assignment.encadrant}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              {' '}
+                              ·{' '}
+                              <span className="text-[11px] normal-case text-slate-500">
+                                Encadrant : Non renseigné
+                              </span>
+                            </>
+                          )}
+                          {' '}
+                          · Choix #{assignment.priority}
                         </span>
                       </div>
                     ) : (
