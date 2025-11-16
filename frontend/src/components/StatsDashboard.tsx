@@ -16,6 +16,7 @@ interface Pick {
   subjectType: 'Classique' | '1275' | string;
   specialty: string;
   isOutOfSpecialty?: boolean;
+  encadrant?: string; // ✅ récupéré depuis choices.picks si présent
 }
 
 interface ChoiceRow {
@@ -35,7 +36,6 @@ function StatsDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [specialtyFilter, setSpecialtyFilter] = useState<string>('');
 
-  // --- Chargement des choix depuis PocketBase ---
   useEffect(() => {
     let disposed = false;
     let unsubscribe: (() => void) | undefined;
@@ -62,10 +62,8 @@ function StatsDashboard() {
       }
     };
 
-    // premier chargement
     refresh();
 
-    // abonnement temps réel
     (async () => {
       try {
         unsubscribe = await pb.collection('choices').subscribe('*', refresh);
@@ -80,7 +78,6 @@ function StatsDashboard() {
     };
   }, []);
 
-  // --- Liste des spécialités disponibles ---
   const specialties = useMemo(
     () => Array.from(new Set(rows.map((r) => r.specialty))).sort(),
     [rows],
@@ -94,27 +91,28 @@ function StatsDashboard() {
     [rows, specialtyFilter],
   );
 
-  // --- Formatage des noms d’étudiants pour l’affichage ---
   function formatMembers(row: ChoiceRow): string {
     if (Array.isArray(row.members) && row.members.length > 0) {
       return row.members
         .map((m) => `${m.nom} ${m.prenom}`)
         .join(row.members.length === 2 ? ' & ' : ', ');
     }
-    // fallback : index des membres si jamais members est vide
     return row.membersIndex;
   }
 
-  // --- Algorithme d’affectation des sujets en fonction du score + priorités ---
-  // On ne touche pas à PocketBase : c’est uniquement une simulation côté UI.
+  // 🧠 Algorithme d’affectation : respect du score + priorité 1→4
   const assignmentsByChoiceId = useMemo(() => {
     const takenSubjects = new Set<string>();
     const result: Record<
       string,
-      { subjectCode: string; subjectTitle: string; priority: number }
+      {
+        subjectCode: string;
+        subjectTitle: string;
+        priority: number;
+        encadrant?: string;
+      }
     > = {};
 
-    // On reparcourt les lignes triées par score décroissant
     const sortedByScore = [...rows].sort(
       (a, b) => b.priorityScore - a.priorityScore,
     );
@@ -132,6 +130,7 @@ function StatsDashboard() {
           subjectCode: chosen.subjectCode,
           subjectTitle: chosen.subjectTitle,
           priority: chosen.priority,
+          encadrant: chosen.encadrant,
         };
       }
     }
@@ -180,7 +179,8 @@ function StatsDashboard() {
           <p className="text-xs text-slate-500">
             Trié par score de priorité décroissant (moyenne + ordre des choix).
             L&apos;affectation des sujets est calculée en tenant compte du score
-            et de la priorité (choix 1 ➝ 4).
+            et de la priorité (choix 1 à 4), chaque sujet ne pouvant être
+            attribué qu&apos;une seule fois.
           </p>
         </div>
 
@@ -235,8 +235,12 @@ function StatsDashboard() {
                           {assignment.subjectTitle}
                         </span>
                         <span className="text-[11px] uppercase text-slate-400">
-                          Code&nbsp;: {assignment.subjectCode} · Choix #
+                          Code : {assignment.subjectCode} · Choix #
                           {assignment.priority}
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          Encadrant :{' '}
+                          {assignment.encadrant ?? 'Non renseigné'}
                         </span>
                       </div>
                     ) : (
