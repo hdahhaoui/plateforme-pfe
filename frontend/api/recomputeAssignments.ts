@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { getPocketBaseAdmin } from './_lib/pocketbase';
 import { recomputeAssignments } from './_lib/matching';
 
