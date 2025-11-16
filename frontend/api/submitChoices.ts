@@ -5,7 +5,6 @@ import { getPocketBaseAdmin } from './_lib/pocketbase.js';
 import { recomputeAssignments } from './_lib/matching.js';
 import type { ChoicePick, Mode, StudentRecord, SubjectRecord } from './_lib/types';
 
-
 interface SubmitBody {
   members: { matricule: string }[];
   picks: ChoicePick[];
@@ -25,20 +24,22 @@ function validateChoicePayload(params: {
 }) {
   const { mode, members, picks, specialty, subjectsMap } = params;
 
+  // Vérif monome / binome
   if (mode === 'monome' && members.length !== 1) {
     throw new Error('Sélectionnez un seul étudiant pour le mode monome.');
   }
+
   if (mode === 'binome' && members.length !== 2) {
     throw new Error('Le mode binôme nécessite deux étudiants.');
   }
 
+  // Exiger exactement 4 choix
   if (picks.length !== 4) {
     throw new Error('Vous devez fournir exactement 4 sujets.');
   }
 
   const seenSubjects = new Set<string>();
   let outOfSpecialtyCount = 0;
-  let subjectType: 'classique' | '1275' | null = null;
 
   picks.forEach((pick) => {
     if (seenSubjects.has(pick.subjectCode)) {
@@ -52,22 +53,18 @@ function validateChoicePayload(params: {
     }
 
     const currentType = normalizeType(subject.type_sujet);
-    if (!subjectType) {
-      subjectType = currentType;
-    }
-
-    if (subjectType !== currentType) {
-      throw new Error('Tous les choix doivent être du même type (4 classiques OU 4 projets 1275).');
-    }
-
     const memberSpecialty = specialty || members[0]?.specialite;
 
+    // Classique: obligé dans la spécialité
     if (currentType === 'classique' && subject.specialite !== memberSpecialty) {
-      throw new Error('Les sujets classiques doivent appartenir à votre spécialité.');
+      throw new Error(
+        'Les sujets classiques doivent appartenir à votre spécialité.',
+      );
     }
 
+    // 1275 hors spécialité : on peut garder la règle "max 1"
     if (subject.specialite !== memberSpecialty && currentType === '1275') {
-      outOfSpecialtyCount++;
+      outOfSpecialtyCount += 1;
     }
   });
 
@@ -76,6 +73,7 @@ function validateChoicePayload(params: {
   }
 }
 
+// Score de priorité = moyenne du binôme / monôme
 function computePriorityScore(members: StudentRecord[]) {
   const total = members.reduce((acc, m) => acc + Number(m.moyenne || 0), 0);
   return Math.round((total / members.length) * 100) / 100;
@@ -88,7 +86,8 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const body: SubmitBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const body: SubmitBody =
+      typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
     if (!body || !Array.isArray(body.members) || !Array.isArray(body.picks)) {
       throw new Error('Payload invalide.');
@@ -96,9 +95,11 @@ export default async function handler(req: any, res: any) {
 
     const pb = await getPocketBaseAdmin();
 
+    // Récupérer les étudiants
     const memberRecords = await Promise.all(
       body.members.map((m) =>
-        pb.collection('students')
+        pb
+          .collection('students')
           .getFirstListItem(`matricule="${m.matricule}"`)
           .catch(() => {
             throw new Error(`Étudiant introuvable (${m.matricule}).`);
@@ -106,7 +107,7 @@ export default async function handler(req: any, res: any) {
       ),
     );
 
-    const normalizedMembers = memberRecords.map((r: any) => ({
+    const normalizedMembers: StudentRecord[] = memberRecords.map((r: any) => ({
       id: r.id,
       matricule: r.matricule,
       nom: r.nom,
@@ -127,13 +128,11 @@ export default async function handler(req: any, res: any) {
           .catch(() => {
             throw new Error(`Sujet introuvable (${pick.subjectCode}).`);
           });
-
-        // 👇 Ici on assouplit le typage pour éviter l'erreur TS2352
         subjectsMap.set(pick.subjectCode, subject as any);
       }
     }
 
-
+    // Validation logique (sans contrainte "tous du même type")
     validateChoicePayload({
       mode: body.mode,
       members: normalizedMembers,
@@ -142,6 +141,7 @@ export default async function handler(req: any, res: any) {
       subjectsMap,
     });
 
+    // Vérifier que ces étudiants n’ont pas déjà soumis
     const existingChoices = await pb.collection('choices').getFullList({
       fields: 'id,membersIndex',
     });
@@ -152,12 +152,15 @@ export default async function handler(req: any, res: any) {
     );
 
     if (conflict) {
-      throw new Error('Un des étudiants a déjà enregistré ses choix.');
+      throw new Error(
+        'Un des étudiants sélectionnés a déjà enregistré ses choix.',
+      );
     }
 
     const priorityScore = computePriorityScore(normalizedMembers);
     const membersIndex = [...selectedIds].sort().join('|');
 
+    // Création du document "choices"
     await pb.collection('choices').create({
       mode: body.mode,
       members: normalizedMembers,
@@ -173,11 +176,14 @@ export default async function handler(req: any, res: any) {
       needsAttention: false,
     });
 
+    // Recalcul des affectations (stub pour l’instant)
     await recomputeAssignments(pb);
 
     res.status(200).json({ success: true });
   } catch (error: any) {
     console.error('Erreur submitChoices:', error);
-    res.status(400).json({ error: error?.message || 'Erreur inattendue.' });
+    res
+      .status(400)
+      .json({ error: error?.message || 'Erreur inattendue côté serveur.' });
   }
 }
