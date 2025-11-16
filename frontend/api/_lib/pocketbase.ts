@@ -1,4 +1,5 @@
-/// <reference types="node" />
+// Déclaration minimale pour que TypeScript accepte process.env
+declare const process: any;
 
 import PocketBase from 'pocketbase';
 
@@ -7,7 +8,7 @@ const pbUrl =
   process.env.VITE_POCKETBASE_URL ??
   'https://pocketbase-fly-late-glade-7750.fly.dev';
 
-// Client simple (par exemple si un composant a besoin d'un pb)
+// Client simple
 export function getPocketBase() {
   const pb = new PocketBase(pbUrl);
   pb.autoCancellation(false);
@@ -18,16 +19,15 @@ export function getPocketBase() {
 export async function getPocketBaseAdmin() {
   const pb = new PocketBase(pbUrl);
 
-  // Auth ADMIN avec les variables d'environnement Vercel
   await pb.admins.authWithPassword(
-    process.env.POCKETBASE_ADMIN_EMAIL!,     // Ton email admin PocketBase (via Vercel)
-    process.env.POCKETBASE_ADMIN_PASSWORD!,  // Ton mot de passe admin (via Vercel)
+    process.env.POCKETBASE_ADMIN_EMAIL!,     // via variables Vercel
+    process.env.POCKETBASE_ADMIN_PASSWORD!,  // via variables Vercel
   );
 
   pb.autoCancellation(false);
   return pb;
 }
 
-// Export par défaut (facultatif mais utile)
+// Export par défaut
 const defaultClient = getPocketBase();
 export default defaultClient;
