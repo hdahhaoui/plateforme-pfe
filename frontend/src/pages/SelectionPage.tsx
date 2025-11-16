@@ -4,24 +4,18 @@ import StudentSelector from '../components/StudentSelector';
 import ChoiceWizard from '../components/ChoiceWizard';
 import { useSelectionStore } from '../store/useSelectionStore';
 import { useSubjects } from '../hooks/useSubjects';
+import pb from '../config/pocketbase';
 
 function useQuery() {
   const { search } = useLocation();
   return useMemo(() => new URLSearchParams(search), [search]);
 }
 
-// petite fonction pour nettoyer les libellés de spécialité
-function normalizeSpecialtyLabel(raw: string) {
-  if (!raw) return '';
-  const trimmed = raw.trim();
-  return trimmed.replace(/^"(.*)"$/, '$1');
-}
-
 function SelectionPage() {
   const query = useQuery();
   const modeQuery = query.get('mode') === 'binome' ? 'binome' : 'monome';
 
-  // on récupère tous les sujets, juste pour construire la liste des spécialités
+  // Tous les sujets pour construire la liste des spécialités
   const { subjects } = useSubjects();
 
   const { members, setMembers, mode, setMode, picks } = useSelectionStore();
@@ -33,52 +27,74 @@ function SelectionPage() {
     setMode(modeQuery);
   }, [modeQuery, setMode]);
 
-  const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
-
-  // spécialités uniques, normalisées
-  const specialties = useMemo(
+  // Liste des spécialités uniques, triées
+  const specialtyOptions = useMemo(
     () =>
-      Array.from(
-        new Set(
-          subjects.map((subject) => normalizeSpecialtyLabel(subject.specialite)),
-        ),
-      ).filter((s) => s !== ''),
+      Array.from(new Set(subjects.map((s) => s.specialite)))
+        .filter((s) => !!s)
+        .sort(),
     [subjects],
   );
 
   const submitChoices = async () => {
     setMessage(null);
+
     if (members.length === 0 || picks.length === 0) {
       setMessage('Sélectionnez au moins un étudiant et un sujet.');
       return;
     }
 
     setSubmitting(true);
-    try {
-      const response = await fetch(`${apiBase}/api/submitChoices`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          members: members.map((member) => ({ matricule: member.matricule })),
-          picks: picks.map((pick) => ({
-            subjectCode: pick.subjectCode,
-            priority: pick.priority,
-            isOutOfSpecialty: pick.isOutOfSpecialty,
-          })),
-          specialty: specialty || members[0]?.specialite,
-          mode,
-        }),
-      });
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload?.error || 'Impossible de soumettre vos choix.');
-      }
+    try {
+      const chosenSpecialty = specialty || members[0]?.specialite;
+
+      // Index stable pour identifier le groupe (mono ou binôme)
+      const membersIndex = members
+        .map((m) => m.matricule)
+        .sort()
+        .join('-');
+
+      // Score simple : moyenne des moyennes des membres
+      const avgMoyenne =
+        members.length > 0
+          ? members.reduce((sum, m) => sum + (m.moyenne ?? 0), 0) / members.length
+          : 0;
+
+      const payload = {
+        mode,
+        // on stocke quelques infos de l’étudiant dans le JSON members
+        members: members.map((m) => ({
+          matricule: m.matricule,
+          nom: m.nom,
+          prenom: m.prenom,
+          specialite: m.specialite,
+          moyenne: m.moyenne,
+        })),
+        membersIndex,
+        specialty: chosenSpecialty,
+        picks: picks
+          .slice()
+          .sort((a, b) => a.priority - b.priority)
+          .map((p) => ({
+            subjectCode: p.subjectCode,
+            priority: p.priority,
+            isOutOfSpecialty: p.isOutOfSpecialty,
+            subjectType: p.subjectType,
+            specialty: p.specialty,
+          })),
+        priorityScore: avgMoyenne, // respect le schéma (0–20)
+        status: 'pending',          // valeur par défaut raisonnable
+        locked: true,               // le choix est figé une fois soumis
+      };
+
+      await pb.collection('choices').create(payload);
 
       setMessage('Vos choix ont été enregistrés et verrouillés.');
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Erreur submitChoices PocketBase', err);
       setMessage(
-        err instanceof Error ? err.message : 'Erreur lors de la soumission.',
+        err?.message || 'Erreur lors de la soumission.',
       );
     } finally {
       setSubmitting(false);
@@ -97,16 +113,13 @@ function SelectionPage() {
           </h2>
         </div>
 
-        {/* Select de spécialité */}
         <select
           className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
           value={specialty || ''}
-          onChange={(event) =>
-            setSpecialty(event.target.value || undefined)
-          }
+          onChange={(event) => setSpecialty(event.target.value || undefined)}
         >
           <option value="">Toutes les spécialités</option>
-          {specialties.map((s) => (
+          {specialtyOptions.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
@@ -122,7 +135,7 @@ function SelectionPage() {
         mode={mode}
       />
 
-      {/* Saisie des choix de sujets (la spécialité est envoyée à ChoiceWizard) */}
+      {/* Choix de sujets filtrés par spécialité */}
       <ChoiceWizard
         specialty={specialty || members[0]?.specialite}
         onSubmit={submitChoices}
