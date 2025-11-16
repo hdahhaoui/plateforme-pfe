@@ -94,6 +94,12 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
                 <p className="text-xs text-slate-500">
                   {subject.specialite} · {subject.type_sujet.toUpperCase()}
                 </p>
+                <p className="text-xs text-slate-500">
+                  Code sujet : {subject.code}
+                </p>
+                <p className="text-xs text-slate-500">
+                  Encadrant : {subject.encadrant || '—'}
+                </p>
               </button>
             ))}
           </div>
