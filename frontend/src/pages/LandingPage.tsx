@@ -44,7 +44,7 @@ function LandingPage() {
 
       <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-sm text-slate-500">
         <p>
-          🔁 Mise à jour des sujets et étudiants via fichiers Excel/CSV importés sur Firebase Storage. Les règles de
+          🔁 Mise à jour des sujets et étudiants. Les règles de
           spécialité, les quotas et les projets 1275 sont appliqués automatiquement.
         </p>
       </div>
