@@ -17,14 +17,23 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const body: SubmitBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const body: SubmitBody =
+      typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
     if (!body || !Array.isArray(body.members) || !Array.isArray(body.picks)) {
       throw new Error('Payload invalide.');
     }
 
+    // ✅ Exiger exactement 4 sujets
+    if (body.picks.length !== 4) {
+      throw new Error(
+        'Vous devez choisir exactement 4 sujets avant de soumettre vos choix.',
+      );
+    }
+
     const pb = await getPocketBaseAdmin();
 
+    // Récupération des étudiants
     const memberRecords = await Promise.all(
       body.members.map((member) =>
         pb
@@ -36,17 +45,20 @@ export default async function handler(req: any, res: any) {
       ),
     );
 
-    const normalizedMembers: StudentRecord[] = memberRecords.map((record: any) => ({
-      id: record.id,
-      matricule: record.matricule,
-      nom: record.nom,
-      prenom: record.prenom,
-      specialite: record.specialite,
-      moyenne: record.moyenne,
-      email: record.email,
-      phone: record.phone,
-    }));
+    const normalizedMembers: StudentRecord[] = memberRecords.map(
+      (record: any) => ({
+        id: record.id,
+        matricule: record.matricule,
+        nom: record.nom,
+        prenom: record.prenom,
+        specialite: record.specialite,
+        moyenne: record.moyenne,
+        email: record.email,
+        phone: record.phone,
+      }),
+    );
 
+    // Récupération des sujets correspondants aux picks
     const subjectsMap = new Map<string, any>();
     for (const pick of body.picks) {
       if (!subjectsMap.has(pick.subjectCode)) {
@@ -60,6 +72,7 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    // Validation métier (spécialité, 1275, doublons, etc.)
     validateChoicePayload({
       mode: body.mode,
       members: normalizedMembers,
@@ -68,15 +81,20 @@ export default async function handler(req: any, res: any) {
       subjectsMap,
     });
 
+    // Vérifier qu’aucun des étudiants n’a déjà enregistré des choix
     const existingChoices = await pb.collection('choices').getFullList({
       fields: 'id,membersIndex',
     });
     const selectedIds = normalizedMembers.map((member) => member.matricule);
+
     const conflict = existingChoices.some((choice: any) =>
       selectedIds.some((id) => (choice.membersIndex || '').includes(id)),
     );
+
     if (conflict) {
-      throw new Error('Un des étudiants sélectionnés a déjà enregistré ses choix.');
+      throw new Error(
+        'Un des étudiants sélectionnés a déjà enregistré ses choix.',
+      );
     }
 
     const priorityScore = computePriorityScore(normalizedMembers);
@@ -97,10 +115,12 @@ export default async function handler(req: any, res: any) {
       needsAttention: false,
     });
 
+    // Recalcul des affectations après chaque soumission
     await recomputeAssignments(pb);
 
     res.status(200).json({ success: true });
   } catch (error: any) {
+    console.error('Erreur submitChoices:', error);
     res.status(400).json({ error: error?.message || 'Erreur inattendue.' });
   }
 }
