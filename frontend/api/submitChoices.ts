@@ -2,7 +2,7 @@
 declare const process: any;
 
 import { getPocketBaseAdmin } from './_lib/pocketbase.js';
-import { recomputeAssignments } from './_lib/matching';
+import { recomputeAssignments } from './_lib/matching.js';
 import type { ChoicePick, Mode, StudentRecord, SubjectRecord } from './_lib/types';
 
 
