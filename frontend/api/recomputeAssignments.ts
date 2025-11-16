@@ -1,4 +1,5 @@
-/// <reference types="node" />
+// Pour que TypeScript accepte process.env sans types Node
+declare const process: any;
 
 import { getPocketBaseAdmin } from './_lib/pocketbase';
 import { recomputeAssignments } from './_lib/matching';
@@ -20,6 +21,8 @@ export default async function handler(req: any, res: any) {
     await recomputeAssignments(pb);
     res.status(200).json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ error: error?.message || 'Erreur lors du recalcul.' });
+    res
+      .status(500)
+      .json({ error: error?.message || 'Erreur lors du recalcul.' });
   }
 }
