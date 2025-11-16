@@ -16,7 +16,7 @@ interface Pick {
   subjectType: 'Classique' | '1275' | string;
   specialty: string;
   isOutOfSpecialty?: boolean;
-  encadrant?: string; // peut venir de choices.picks, mais pas garanti
+  encadrant?: string;
 }
 
 interface ChoiceRow {
@@ -30,25 +30,15 @@ interface ChoiceRow {
   status: string;
 }
 
-// petite interface pour ce qu'on récupère depuis "subjects"
-interface SubjectInfo {
-  code: string;
-  encadrant?: string;
-}
-
 function StatsDashboard() {
   const [rows, setRows] = useState<ChoiceRow[]>([]);
-  const [subjectsByCode, setSubjectsByCode] = useState<
-    Record<string, SubjectInfo>
-  >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [specialtyFilter, setSpecialtyFilter] = useState<string>('');
 
-  // 🔹 Chargement des choix (collection "choices")
+  // 🔁 Chargement simple (pas de temps réel)
   useEffect(() => {
     let disposed = false;
-    let unsubscribe: (() => void) | undefined;
 
     const refresh = async () => {
       try {
@@ -73,50 +63,6 @@ function StatsDashboard() {
     };
 
     refresh();
-
-    (async () => {
-      try {
-        unsubscribe = await pb.collection('choices').subscribe('*', refresh);
-      } catch (err) {
-        console.error('Subscription choices échouée', err);
-      }
-    })();
-
-    return () => {
-      disposed = true;
-      unsubscribe?.();
-    };
-  }, []);
-
-  // 🔹 Chargement des sujets (collection "subjects") pour récupérer l'encadrant
-  useEffect(() => {
-    let disposed = false;
-
-    const loadSubjects = async () => {
-      try {
-        const list = await pb.collection('subjects').getList(1, 200, {
-          sort: 'code',
-        });
-
-        if (disposed) return;
-
-        const map: Record<string, SubjectInfo> = {};
-        for (const item of list.items as any[]) {
-          if (!item.code) continue;
-          map[item.code] = {
-            code: item.code,
-            encadrant: item.encadrant,
-          };
-        }
-
-        setSubjectsByCode(map);
-      } catch (err) {
-        console.error('Impossible de charger les sujets pour encadrants', err);
-        // pas bloquant pour la page : on garde juste map vide
-      }
-    };
-
-    loadSubjects();
 
     return () => {
       disposed = true;
@@ -145,7 +91,6 @@ function StatsDashboard() {
     return row.membersIndex;
   }
 
-  // 🧠 Algorithme d’affectation : respect du score + priorité 1→4
   const assignmentsByChoiceId = useMemo(() => {
     const takenSubjects = new Set<string>();
     const result: Record<
@@ -158,13 +103,11 @@ function StatsDashboard() {
       }
     > = {};
 
-    // tri global par score décroissant
     const sortedByScore = [...rows].sort(
       (a, b) => b.priorityScore - a.priorityScore,
     );
 
     for (const row of sortedByScore) {
-      // tri des picks par priorité 1→4
       const picks = [...(row.picks ?? [])].sort(
         (a, b) => (a.priority || 0) - (b.priority || 0),
       );
@@ -173,29 +116,24 @@ function StatsDashboard() {
 
       if (chosen) {
         takenSubjects.add(chosen.subjectCode);
-
-        // 🔎 encadrant : priorité à ce qui vient de choices,
-        // sinon on complète avec la collection "subjects"
-        const subjectInfo = subjectsByCode[chosen.subjectCode];
-        const encadrant =
-          chosen.encadrant || subjectInfo?.encadrant || undefined;
-
         result[row.id] = {
           subjectCode: chosen.subjectCode,
           subjectTitle: chosen.subjectTitle,
           priority: chosen.priority,
-          encadrant,
+          encadrant: chosen.encadrant,
         };
       }
     }
 
     return result;
-  }, [rows, subjectsByCode]);
+  }, [rows]);
 
   if (loading) {
     return (
       <div className="rounded-xl bg-white p-6 shadow-sm">
-        <p className="text-sm text-slate-500">Chargement des classements…</p>
+        <p className="text-sm text-slate-500">
+          Chargement des classements…
+        </p>
       </div>
     );
   }
