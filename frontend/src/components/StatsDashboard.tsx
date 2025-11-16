@@ -1,11 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 import pb from '../config/pocketbase';
 
+interface Member {
+  matricule: string;
+  nom: string;
+  prenom: string;
+  specialite?: string;
+  moyenne?: number;
+}
+
+interface Pick {
+  subjectCode: string;
+  subjectTitle: string;
+  priority: number;
+  subjectType: 'Classique' | '1275' | string;
+  specialty: string;
+  isOutOfSpecialty?: boolean;
+}
+
 interface ChoiceRow {
   id: string;
-  mode: 'monome' | 'binome';
+  mode: 'monome' | 'binome' | string;
   specialty: string;
   membersIndex: string;
+  members?: Member[];
+  picks?: Pick[];
   priorityScore: number;
   status: string;
 }
@@ -16,6 +35,7 @@ function StatsDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [specialtyFilter, setSpecialtyFilter] = useState<string>('');
 
+  // --- Chargement des choix depuis PocketBase ---
   useEffect(() => {
     let disposed = false;
     let unsubscribe: (() => void) | undefined;
@@ -60,6 +80,7 @@ function StatsDashboard() {
     };
   }, []);
 
+  // --- Liste des spécialités disponibles ---
   const specialties = useMemo(
     () => Array.from(new Set(rows.map((r) => r.specialty))).sort(),
     [rows],
@@ -72,6 +93,51 @@ function StatsDashboard() {
       ),
     [rows, specialtyFilter],
   );
+
+  // --- Formatage des noms d’étudiants pour l’affichage ---
+  function formatMembers(row: ChoiceRow): string {
+    if (Array.isArray(row.members) && row.members.length > 0) {
+      return row.members
+        .map((m) => `${m.nom} ${m.prenom}`)
+        .join(row.members.length === 2 ? ' & ' : ', ');
+    }
+    // fallback : index des membres si jamais members est vide
+    return row.membersIndex;
+  }
+
+  // --- Algorithme d’affectation des sujets en fonction du score + priorités ---
+  // On ne touche pas à PocketBase : c’est uniquement une simulation côté UI.
+  const assignmentsByChoiceId = useMemo(() => {
+    const takenSubjects = new Set<string>();
+    const result: Record<
+      string,
+      { subjectCode: string; subjectTitle: string; priority: number }
+    > = {};
+
+    // On reparcourt les lignes triées par score décroissant
+    const sortedByScore = [...rows].sort(
+      (a, b) => b.priorityScore - a.priorityScore,
+    );
+
+    for (const row of sortedByScore) {
+      const picks = [...(row.picks ?? [])].sort(
+        (a, b) => (a.priority || 0) - (b.priority || 0),
+      );
+
+      const chosen = picks.find((pick) => !takenSubjects.has(pick.subjectCode));
+
+      if (chosen) {
+        takenSubjects.add(chosen.subjectCode);
+        result[row.id] = {
+          subjectCode: chosen.subjectCode,
+          subjectTitle: chosen.subjectTitle,
+          priority: chosen.priority,
+        };
+      }
+    }
+
+    return result;
+  }, [rows]);
 
   if (loading) {
     return (
@@ -113,6 +179,8 @@ function StatsDashboard() {
           </h2>
           <p className="text-xs text-slate-500">
             Trié par score de priorité décroissant (moyenne + ordre des choix).
+            L&apos;affectation des sujets est calculée en tenant compte du score
+            et de la priorité (choix 1 ➝ 4).
           </p>
         </div>
 
@@ -137,33 +205,55 @@ function StatsDashboard() {
               <th className="py-2">#</th>
               <th className="py-2">Mode</th>
               <th className="py-2">Spécialité</th>
-              <th className="py-2">Index membres</th>
+              <th className="py-2">Étudiants</th>
+              <th className="py-2">Sujet affecté</th>
               <th className="py-2">Score de priorité</th>
               <th className="py-2">Statut</th>
             </tr>
           </thead>
           <tbody>
-            {filteredRows.map((row, index) => (
-              <tr
-                key={row.id}
-                className="border-b border-slate-100 last:border-b-0"
-              >
-                <td className="py-2 pr-2 text-xs text-slate-500">
-                  {index + 1}
-                </td>
-                <td className="py-2">
-                  {row.mode === 'binome' ? 'Binôme' : 'Monome'}
-                </td>
-                <td className="py-2">{row.specialty}</td>
-                <td className="py-2">{row.membersIndex}</td>
-                <td className="py-2 font-semibold">
-                  {row.priorityScore.toFixed(2)}
-                </td>
-                <td className="py-2 text-xs uppercase text-slate-500">
-                  {row.status}
-                </td>
-              </tr>
-            ))}
+            {filteredRows.map((row, index) => {
+              const assignment = assignmentsByChoiceId[row.id];
+
+              return (
+                <tr
+                  key={row.id}
+                  className="border-b border-slate-100 last:border-b-0"
+                >
+                  <td className="py-2 pr-2 text-xs text-slate-500">
+                    {index + 1}
+                  </td>
+                  <td className="py-2">
+                    {row.mode === 'binome' ? 'Binôme' : 'Monome'}
+                  </td>
+                  <td className="py-2">{row.specialty}</td>
+                  <td className="py-2">{formatMembers(row)}</td>
+                  <td className="py-2">
+                    {assignment ? (
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-slate-800">
+                          {assignment.subjectTitle}
+                        </span>
+                        <span className="text-[11px] uppercase text-slate-400">
+                          Code&nbsp;: {assignment.subjectCode} · Choix #
+                          {assignment.priority}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-slate-400">
+                        Aucun sujet disponible sur ses 4 choix
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-2 font-semibold">
+                    {row.priorityScore.toFixed(2)}
+                  </td>
+                  <td className="py-2 text-xs uppercase text-slate-500">
+                    {row.status}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
