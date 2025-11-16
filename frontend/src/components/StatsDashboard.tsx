@@ -179,13 +179,10 @@ function StatsDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-semibold uppercase text-slate-400">
-            Classement en temps réel
           </p>
           <h2 className="text-2xl font-bold text-slate-900">
-            Choix enregistrés par priorité
           </h2>
           <p className="text-xs text-slate-500">
-            Trié par score de priorité décroissant (moyenne + ordre des choix).
           </p>
         </div>
 
