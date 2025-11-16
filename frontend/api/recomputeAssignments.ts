@@ -2,7 +2,7 @@
 declare const process: any;
 
 import { getPocketBaseAdmin } from './_lib/pocketbase.js';
-import { recomputeAssignments } from './_lib/matching';
+import { recomputeAssignments } from './_lib/matching.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
