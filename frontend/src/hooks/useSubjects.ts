@@ -47,12 +47,10 @@ export function useSubjects(selectedSpecialty?: string) {
           options.filter = filter;
         }
 
-        const list = await pb
-          .collection('subjects')
-          .getList(1, 200, options);
+        const list = await pb.collection('subjects').getFullList(options);
 
         if (!disposed) {
-          setSubjects(list.items.map(mapRecord));
+          setSubjects(list.map(mapRecord));
           setLoading(false);
         }
       } catch (error) {
