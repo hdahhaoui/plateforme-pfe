@@ -46,13 +46,23 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
 
   return (
     <div className="space-y-6">
+      {subjects.length === 0 && (
+        <p className="text-sm text-slate-500">
+          Aucun sujet disponible pour cette spécialité.
+        </p>
+      )}
+
       {orderedPicks.map((pick) => (
         <div key={pick.priority} className="rounded-xl bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase text-slate-400">Choix #{pick.priority}</p>
+              <p className="text-xs font-semibold uppercase text-slate-400">
+                Choix #{pick.priority}
+              </p>
               {'subjectCode' in pick ? (
-                <p className="text-lg font-semibold text-slate-900">{pick.subjectTitle}</p>
+                <p className="text-lg font-semibold text-slate-900">
+                  {pick.subjectTitle}
+                </p>
               ) : (
                 <p className="text-sm text-slate-400">Sélectionnez un sujet</p>
               )}
@@ -99,7 +109,8 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
         {submitting ? 'Soumission…' : 'Soumettre mes choix'}
       </button>
       <p className="text-xs text-slate-400">
-        Une fois vos choix enregistrés, ils seront verrouillés. Pour toute modification, contactez l'administration.
+        Une fois vos choix enregistrés, ils seront verrouillés. Pour toute
+        modification, contactez l'administration.
       </p>
     </div>
   );
