@@ -31,6 +31,9 @@ interface ChoiceRow {
   status: string;
 }
 
+const normalizeSubjectCode = (code?: string) =>
+  (code ?? '').trim().toUpperCase();
+
 function StatsDashboard() {
   const [rows, setRows] = useState<ChoiceRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,8 +44,9 @@ function StatsDashboard() {
   const subjectsEncadrantsByCode = useMemo(() => {
     const map: Record<string, string> = {};
     subjects.forEach((subject) => {
-      if (subject.code) {
-        map[subject.code] = subject.encadrant;
+      const normalizedCode = normalizeSubjectCode(subject.code);
+      if (normalizedCode) {
+        map[normalizedCode] = subject.encadrant;
       }
     });
     return map;
@@ -127,7 +131,8 @@ function StatsDashboard() {
       const chosen = picks.find((pick) => !takenSubjects.has(pick.subjectCode));
 
       if (chosen) {
-        const encadrantFromSubject = subjectsEncadrantsByCode[chosen.subjectCode];
+        const encadrantFromSubject =
+          subjectsEncadrantsByCode[normalizeSubjectCode(chosen.subjectCode)];
         takenSubjects.add(chosen.subjectCode);
         result[row.id] = {
           subjectCode: chosen.subjectCode,
