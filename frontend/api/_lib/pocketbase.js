@@ -4,26 +4,20 @@ const pbUrl =
   process.env.VITE_POCKETBASE_URL ??
   'https://pocketbase-fly-late-glade-7750.fly.dev';
 
-// Client simple
+// On crée UN seul client PocketBase réutilisé
+const pb = new PocketBase(pbUrl);
+pb.autoCancellation(false);
+
+// Client simple (lecture/écriture selon les règles des collections)
 export function getPocketBase() {
-  const pb = new PocketBase(pbUrl);
-  pb.autoCancellation(false);
   return pb;
 }
 
-// Client ADMIN utilisé par submitChoices & recomputeAssignments
+// "Admin" logique : pour l'instant, on utilise le même client
+// (pas d'authentification admin, donc pas d'appel /api/admins/auth-with-password)
 export async function getPocketBaseAdmin() {
-  const pb = new PocketBase(pbUrl);
-
-  await pb.admins.authWithPassword(
-    process.env.POCKETBASE_ADMIN_EMAIL,
-    process.env.POCKETBASE_ADMIN_PASSWORD,
-  );
-
-  pb.autoCancellation(false);
   return pb;
 }
 
 // Export par défaut
-const defaultClient = getPocketBase();
-export default defaultClient;
+export default pb;
