@@ -13,12 +13,15 @@ function useQuery() {
 function SelectionPage() {
   const query = useQuery();
   const modeQuery = query.get('mode') === 'binome' ? 'binome' : 'monome';
+
   const { subjects } = useSubjects();
   const { members, setMembers, mode, setMode, picks } = useSelectionStore();
+
   const [specialty, setSpecialty] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  // sync du mode avec le paramètre d'URL
   useEffect(() => {
     setMode(modeQuery);
   }, [modeQuery, setMode]);
@@ -28,13 +31,13 @@ function SelectionPage() {
   const submitChoices = async () => {
     setMessage(null);
 
-    // 1) Vérifier qu'un étudiant est sélectionné
+    // 1) vérifier qu’un étudiant est choisi
     if (members.length === 0) {
       setMessage('Sélectionnez d’abord un étudiant.');
       return;
     }
 
-    // 2) Vérifier qu’on a exactement 4 sujets
+    // 2) imposer exactement 4 sujets
     if (picks.length !== 4) {
       setMessage('Vous devez sélectionner exactement 4 sujets.');
       return;
@@ -58,46 +61,16 @@ function SelectionPage() {
       });
 
       if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        // On remonte le vrai message backend si disponible
+        let payload: any = {};
+        try {
+          payload = await response.json();
+        } catch (_) {
+          // pas un JSON → on garde le message générique
+        }
+
         throw new Error(
           (payload && payload.error) || 'Impossible de soumettre vos choix.',
         );
-      }
-
-      setMessage('Vos choix ont été enregistrés et verrouillés.');
-    } catch (err) {
-      setMessage(
-        err instanceof Error ? err.message : 'Erreur lors de la soumission.',
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        // On remonte le vrai message backend si disponible
-        throw new Error(
-          (payload && payload.error) || 'Impossible de soumettre vos choix.',
-        );
-      }
-
-      setMessage('Vos choix ont été enregistrés et verrouillés.');
-    } catch (err) {
-      setMessage(
-        err instanceof Error ? err.message : 'Erreur lors de la soumission.',
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload?.error || 'Impossible de soumettre vos choix.');
       }
 
       setMessage('Vos choix ont été enregistrés et verrouillés.');
@@ -121,6 +94,7 @@ function SelectionPage() {
             {mode === 'binome' ? 'Binôme' : 'Monome'}
           </h2>
         </div>
+
         <select
           className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
           value={specialty || ''}
