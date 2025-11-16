@@ -8,7 +8,7 @@ const cards = [
   },
   {
     title: 'Binôme',
-    description: 'Sélectionnez deux étudiants, calculez la moyenne combinée et soumettez vos choix.',
+    description: 'Sélectionnez deux étudiants, calculez la moyenne combinée et soumettez vos choix (classique ou 1275).',
     to: '/selection?mode=binome',
   },
 ];
