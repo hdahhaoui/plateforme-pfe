@@ -26,7 +26,11 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
     [picks],
   );
 
-  const handleSelect = (priority: number, subject: Subject, isOutOfSpecialty: boolean) => {
+  const handleSelect = (
+    priority: number,
+    subject: Subject,
+    isOutOfSpecialty: boolean,
+  ) => {
     const next: ChoiceSelection = {
       subjectCode: subject.code,
       subjectTitle: subject.titre,
@@ -34,7 +38,6 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
       subjectType: subject.type_sujet,
       specialty: subject.specialite,
       isOutOfSpecialty,
-      encadrant: subject.encadrant, // ✅ on stocke aussi l’encadrant
     };
 
     const filtered = picks.filter(
@@ -43,7 +46,8 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
     setPicks([...filtered, next]);
   };
 
-  const canSubmit = picks.length > 0 && picks.length <= 4;
+  // ✅ on exige maintenant exactement 4 choix
+  const canSubmit = picks.length === 4;
 
   return (
     <div className="space-y-6">
@@ -76,9 +80,10 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
                 key={subject.code}
                 onClick={() =>
                   handleSelect(
-                    (pick as DisplayPick).priority,
+                    pick.priority,
                     subject,
-                    subject.specialite !== specialty && subject.type_sujet === '1275',
+                    subject.specialite !== specialty &&
+                      subject.type_sujet === '1275',
                   )
                 }
                 className="rounded border border-slate-200 p-3 text-left text-sm hover:border-slate-400"
@@ -87,17 +92,21 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
                   {subject.titre}
                 </p>
                 <p className="text-xs text-slate-500">
-                  {subject.code} · {subject.specialite} ·{' '}
-                  {subject.type_sujet.toUpperCase()}
-                </p>
-                <p className="text-xs text-slate-500">
-                  Encadrant : {subject.encadrant}
+                  {subject.specialite} · {subject.type_sujet.toUpperCase()}
                 </p>
               </button>
             ))}
           </div>
         </div>
       ))}
+
+      {/* Message spécifique si on n'a pas encore 4 choix */}
+      {picks.length !== 4 && (
+        <p className="text-xs text-amber-600">
+          Vous devez sélectionner exactement 4 sujets avant de soumettre vos
+          choix.
+        </p>
+      )}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
