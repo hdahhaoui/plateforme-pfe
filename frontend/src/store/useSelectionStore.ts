@@ -14,10 +14,12 @@ export interface ChoiceSelection {
   subjectCode: string;
   subjectTitle: string;
   priority: number;
-  subjectType: 'Classique' | '1275';
+  subjectType: 'Classique' | '1275' | string;
   specialty: string;
   isOutOfSpecialty: boolean;
+  encadrant?: string; // ✅ nouveau
 }
+
 
 interface SelectionState {
   mode: Mode;
