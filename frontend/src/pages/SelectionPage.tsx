@@ -21,8 +21,7 @@ function SelectionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const submissionsClosed =
-    (import.meta.env.VITE_CHOICES_DISABLED || '').toLowerCase() === 'true';
+
   const submissionsClosedMessage =
     import.meta.env.VITE_CHOICES_DISABLED_MESSAGE ||
     'La période de soumission des vœux est terminée.';

@@ -85,8 +85,7 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
-  const submissionsClosed =
-    String(process.env.CHOICES_DISABLED || '').toLowerCase() === 'true';
+
   if (submissionsClosed) {
     res.status(403).json({
       error:
