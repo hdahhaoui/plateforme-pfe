@@ -7,11 +7,20 @@ interface Props {
   onSubmit: () => Promise<void>;
   submitting: boolean;
   error?: string | null;
+  disabled?: boolean;
+  disabledReason?: string;
 }
 
 type DisplayPick = ChoiceSelection | { priority: number };
 
-function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
+function ChoiceWizard({
+  specialty,
+  onSubmit,
+  submitting,
+  error,
+  disabled = false,
+  disabledReason,
+}: Props) {
   const { subjects } = useSubjects(specialty);
   const picks = useSelectionStore((state) => state.picks);
   const setPicks = useSelectionStore((state) => state.setPicks);
@@ -48,6 +57,7 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
 
   // ✅ on exige maintenant exactement 4 choix
   const canSubmit = picks.length === 4;
+  const isSubmitDisabled = disabled || submitting || !canSubmit;
 
   return (
     <div className="space-y-6">
@@ -116,13 +126,24 @@ function ChoiceWizard({ specialty, onSubmit, submitting, error }: Props) {
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
+      {disabled && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {disabledReason ||
+            'La période de soumission est actuellement fermée.'}
+        </div>
+      )}
+
       <button
         type="button"
-        onClick={onSubmit}
-        disabled={!canSubmit || submitting}
+        onClick={disabled ? undefined : onSubmit}
+        disabled={isSubmitDisabled}
         className="w-full rounded-lg bg-slate-900 px-4 py-3 text-white disabled:opacity-40"
       >
-        {submitting ? 'Soumission…' : 'Soumettre mes choix'}
+        {disabled
+          ? 'Soumissions clôturées'
+          : submitting
+            ? 'Soumission…'
+            : 'Soumettre mes choix'}
       </button>
       <p className="text-xs text-slate-400">
         Une fois vos choix enregistrés, ils seront verrouillés. Pour toute

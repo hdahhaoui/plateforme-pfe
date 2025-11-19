@@ -85,6 +85,22 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
+  const submissionsClosed = (() => {
+    const raw = String(process.env.CHOICES_DISABLED || '').trim();
+    if (raw === '') {
+      return true;
+    }
+    return raw.toLowerCase() === 'true';
+  })();
+  if (submissionsClosed) {
+    res.status(403).json({
+      error:
+        process.env.CHOICES_DISABLED_MESSAGE ||
+        'La période de soumission des choix est terminée.',
+    });
+    return;
+  }
+
   try {
     const body: SubmitBody =
       typeof req.body === 'string' ? JSON.parse(req.body) : req.body;

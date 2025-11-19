@@ -28,6 +28,7 @@ Plateforme PFE/
 
 1. Installer PocketBase (binaire autonome) et importer la structure décrite dans `backend/README.md`.
 2. Copier `.env.example` → `.env` (racine) et renseigner `POCKETBASE_URL`, `POCKETBASE_ADMIN_EMAIL`, `POCKETBASE_ADMIN_PASSWORD` (utilisés par les scripts et les fonctions Vercel). `RECOMPUTE_TOKEN` est optionnel (clé secrète pour l’endpoint `/api/recomputeAssignments`).
+   - Par défaut, la plateforme démarre en pause : sans configuration explicite les variables `CHOICES_DISABLED` / `VITE_CHOICES_DISABLED` sont considérées comme `true`. Pour la réactiver, forcez ces variables à `false` (et inversement pour refermer rapidement). Ajoutez éventuellement un message personnalisé via `CHOICES_DISABLED_MESSAGE` / `VITE_CHOICES_DISABLED_MESSAGE`.
 3. `cd frontend && npm install && npm run dev` pour lancer l’interface localement (utilise `VITE_POCKETBASE_URL`). Pour tester les fonctions `api/*` en local, installez la CLI Vercel puis exécutez `vercel dev` à la racine (les requêtes `/api/...` sont alors proxifiées automatiquement).
 4. Déployer sur Vercel (`vercel deploy`) : Vercel build la SPA, expose les fonctions `api/*` et communique avec PocketBase via les variables d’environnement.
 
