@@ -21,6 +21,12 @@ function SelectionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  const submissionsClosed =
+    (import.meta.env.VITE_CHOICES_DISABLED || '').toLowerCase() === 'true';
+  const submissionsClosedMessage =
+    import.meta.env.VITE_CHOICES_DISABLED_MESSAGE ||
+    'La période de soumission des vœux est terminée.';
+
   // sync du mode avec le paramètre d'URL
   useEffect(() => {
     setMode(modeQuery);
@@ -85,6 +91,12 @@ function SelectionPage() {
 
   return (
     <div className="space-y-6">
+      {submissionsClosed && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {submissionsClosedMessage}
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-semibold uppercase text-slate-400">
@@ -123,6 +135,8 @@ function SelectionPage() {
         onSubmit={submitChoices}
         submitting={submitting}
         error={message}
+        disabled={submissionsClosed}
+        disabledReason={submissionsClosedMessage}
       />
     </div>
   );
